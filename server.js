@@ -24,16 +24,16 @@ async function initializeRabbitMQ() {
   }
 }
 
+async function consume(params) {}
+
 //health routes check are not
 
 app.get("/api/health", (req, res) => {
   logger.info("Health check requested");
-  res
-    .status(200)
-    .json({
-      response: "Notification Service is up and running ",
-      status: "OK",
-    });
+  res.status(200).json({
+    response: "Notification Service is up and running ",
+    status: "OK",
+  });
 });
 
 // Initialize on application start
