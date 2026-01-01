@@ -1,0 +1,13 @@
+require("dotenv").config();
+
+module.exports = {
+  ENABLE_APM: process.env.ENABLE_APM,
+  NODE_ENV: process.env.NODE_ENV,
+  CLIENT_URL: process.env.CLIENT_URL,
+  RABBITMQ_ENDPOINT: process.env.RABBITMQ_ENDPOINT,
+  SENDER_EMAIL: process.env.SENDER_EMAIL,
+  SENDER_EMAIL_PASSWORD: process.env.SENDER_EMAIL_PASSWORD,
+  ELASTIC_SEARCH_URL: process.env.ELASTIC_SEARCH_URL,
+  ELASTIC_APM_SERVER_URL: process.env.ELASTIC_APM_SERVER_URL,
+  ELASTIC_APM_SECRET_TOKEN: process.env.ELASTIC_APM_SECRET_TOKEN,
+};
