@@ -1,5 +1,6 @@
 const logger = require("../utils/logger");
-const rabbitMQ = require("../utils/rabbitMQ");
+const rabbitMQ = require("../utils/rabbitmq");
+const transporter = require("../utils/mail-transport");
 
 const consumeAuthEmailMessages = async () => {
   const channel = rabbitMQ.channel;
@@ -18,10 +19,24 @@ const consumeAuthEmailMessages = async () => {
     });
     await channel.bindQueue(jobberQueue.queue, exchangeName, routingKey);
     channel.consume(jobberQueue.queue, async (msg) => {
-      console.log(JSON.parse(msg.content.toString()));
-    });
+      try {
+        const messageData = JSON.parse(msg.content.toString());
+        logger.log("Sending auth email:", messageData);
 
-    channel.ackAll();
+        await transporter.sendMail({
+          from: process.env.SENDER_EMAIL,
+          to: messageData.to,
+          subject: messageData.subject,
+          html: messageData.html,
+        });
+
+        logger.log("Auth email sent successfully");
+        channel.ack(msg);
+      } catch (error) {
+        logger.log("Error sending auth email:", error);
+        channel.nack(msg, false, false);
+      }
+    });
   } catch (error) {
     logger.log("Notification service email consumer error");
   }
@@ -44,10 +59,24 @@ const consumeOrderEmailMessages = async () => {
     });
     await channel.bindQueue(jobberQueue.queue, exchangeName, routingKey);
     channel.consume(jobberQueue.queue, async (msg) => {
-      console.log(JSON.parse(msg.content.toString()));
-    });
+      try {
+        const messageData = JSON.parse(msg.content.toString());
+        logger.log("Sending order email:", messageData);
 
-    channel.ackAll();
+        await transporter.sendMail({
+          from: process.env.SENDER_EMAIL,
+          to: messageData.to,
+          subject: messageData.subject,
+          html: messageData.html,
+        });
+
+        logger.log("Order email sent successfully");
+        channel.ack(msg);
+      } catch (error) {
+        logger.log("Error sending order email:", error);
+        channel.nack(msg, false, false);
+      }
+    });
   } catch (error) {
     logger.log("Notification service email consumer error");
   }
