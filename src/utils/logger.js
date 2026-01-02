@@ -1,18 +1,32 @@
 const winston = require("winston");
-const { ElasticsearchTransport } = require("winston-elasticsearch");
 
-const esTransport = new ElasticsearchTransport({
-  level: "info",
-  clientOpts: {
-    node: process.env.ELASTIC_SEARCH_URL || "http://localhost:9200",
-    maxRetries: 3,
-    requestTimeout: 30000,
-  },
-  index: "app-logs",
-  indexPrefix: "logs",
-  indexSuffixPattern: "YYYY-MM-DD",
-  flushInterval: 5000,
-});
+let transports = [
+  new winston.transports.Console({
+    format: winston.format.simple(),
+  }),
+];
+
+// Only add Elasticsearch transport if ENABLE_APM is set
+if (process.env.ENABLE_APM === "1") {
+  try {
+    const { ElasticsearchTransport } = require("winston-elasticsearch");
+    const esTransport = new ElasticsearchTransport({
+      level: "info",
+      clientOpts: {
+        node: process.env.ELASTIC_SEARCH_URL || "http://localhost:9200",
+        maxRetries: 3,
+        requestTimeout: 30000,
+      },
+      index: "app-logs",
+      indexPrefix: "logs",
+      indexSuffixPattern: "YYYY-MM-DD",
+      flushInterval: 5000,
+    });
+    transports.push(esTransport);
+  } catch (error) {
+    console.warn("Elasticsearch transport not available:", error.message);
+  }
+}
 
 const logger = winston.createLogger({
   level: "info",
@@ -20,12 +34,7 @@ const logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.json()
   ),
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    }),
-    esTransport,
-  ],
+  transports: transports,
 });
 
 module.exports = logger;

@@ -1,75 +1,72 @@
 const express = require("express");
 const logger = require("./src/utils/logger");
 const config = require("./src/utils/config");
-const rabbitMQService = require("./src/utils/rabbitMQ");
+const rabbitMQ = require("./src/utils/rabbitmq");
 const {
   consumeAuthEmailMessages,
   consumeOrderEmailMessages,
 } = require("./src/email-consumer/email-consumer");
+
 const app = express();
 const PORT = config.PORT || 4101;
 
-//queues
-
-// Start the service rabbitmq
-
-//rabbitmq service intialization
+/**
+ * Initialize RabbitMQ and start consumers
+ */
 async function startQueues() {
   try {
-    await rabbitMQService.start();
-    await consumeAuthEmailMessages();
-    await consumeOrderEmailMessages();
+    await rabbitMQ.connect();
 
-    // Set prefetch for fair message distribution
-    await rabbitMQService.setPrefetch(1);
-    //assert channel and message
-    await rabbitMQService.channel.assertExchange(
+    await rabbitMQ.createExchange("jobber-email-notification", "direct");
+    await rabbitMQ.createExchange("order-email-notification", "direct");
+
+    await rabbitMQ.createQueue("auth-email-queue");
+    await rabbitMQ.createQueue("order-email-queue");
+
+    await rabbitMQ.bindQueue(
+      "auth-email-queue",
       "jobber-email-notification",
-      "direct"
+      "auth-email"
     );
 
-    await rabbitMQService.channel.assertExchange(
+    await rabbitMQ.bindQueue(
+      "order-email-queue",
       "order-email-notification",
-      "direct"
+      "order-email"
     );
 
-    const message = { name: "sohail", email: "ksohail470@gmail.com" };
-    const order = { order: "6 pieces of GOLD", address: "Sattelite town RWP" };
+    const data = {
+      to: "sohailturk470@gmail.com",
+      subject: "This is another email",
+      html: "<h1>This is confirmation</h1>",
+    };
 
-    await rabbitMQService.publishToExchange(
-      "jobber-email-notification",
-      "auth-email",
-      message
-    );
+    rabbitMQ.publish("order-email-notification", "order-email", data);
 
-    await rabbitMQService.publishToExchange(
-      "order-email-notification",
-      "order-email",
-      order
-    );
+    consumeAuthEmailMessages();
+    consumeOrderEmailMessages();
 
-    console.log("RabbitMQ service initialized");
+    logger.info("✅ RabbitMQ consumers started successfully");
   } catch (error) {
-    console.error("Failed to initialize RabbitMQ:", error);
+    logger.error("❌ Failed to initialize RabbitMQ", {
+      error: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   }
 }
 
-async function consume() {}
-
-//health routes check are not
-
+// Health check
 app.get("/api/health", (req, res) => {
-  logger.info("Health check requested");
   res.status(200).json({
-    response: "Notification Service is up and running ",
+    response: "Notification Service is up and running",
     status: "OK",
   });
 });
 
-// Initialize on application start
+// Start everything
 startQueues();
 
-app.listen(4101, () => {
-  logger.info(`Notification service is running on port ${PORT}`);
+app.listen(PORT, () => {
+  logger.info(`🚀 Notification service is running on port ${PORT}`);
 });
