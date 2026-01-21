@@ -2,7 +2,12 @@ const logger = require("../utils/logger");
 const rabbitMQ = require("../utils/rabbitmq");
 const transporter = require("../utils/mail-transport");
 const { renderTemplate } = require("../utils/template-renderer");
-
+const {
+  ORDER_EMAIL,
+  ORDER_EMAIL_QUEUE,
+  AUTH_EMAIL_QUEUE,
+} = require("../constants");
+const { RABBITMQ_EXCHANGE } = require("../utils/config");
 /**
  * Render email content based on template or raw html/subject
  */
@@ -10,7 +15,7 @@ const getEmailContent = async (messageData) => {
   if (messageData.template) {
     const rendered = await renderTemplate(
       messageData.template,
-      messageData.data || {}
+      messageData.data || {},
     );
     return {
       subject: rendered.subject,
@@ -28,7 +33,7 @@ const getEmailContent = async (messageData) => {
  * Consume auth emails
  */
 const consumeAuthEmailMessages = () => {
-  rabbitMQ.consume("auth-email-queue", async (messageData) => {
+  rabbitMQ.consume(AUTH_EMAIL_QUEUE, async (messageData) => {
     try {
       logger.info("📧 Sending auth email:", messageData);
 
@@ -54,7 +59,7 @@ const consumeAuthEmailMessages = () => {
  * Consume order emails
  */
 const consumeOrderEmailMessages = () => {
-  rabbitMQ.consume("order-email-queue", async (messageData) => {
+  rabbitMQ.consume(ORDER_EMAIL_QUEUE, async (messageData) => {
     try {
       logger.info("📦 Sending order email:", messageData);
 

@@ -6,6 +6,12 @@ const {
   consumeAuthEmailMessages,
   consumeOrderEmailMessages,
 } = require("./src/email-consumer/email-consumer");
+const {
+  AUTH_EMAIL_QUEUE,
+  ORDER_EMAIL_QUEUE,
+  AUTH_EMAIL,
+  ORDER_EMAIL,
+} = require("./src/constants");
 
 const app = express();
 const PORT = config.PORT || 4101;
@@ -17,22 +23,21 @@ async function startQueues() {
   try {
     await rabbitMQ.connect();
 
-    await rabbitMQ.createExchange("jobber-email-notification", "direct");
-    await rabbitMQ.createExchange("order-email-notification", "direct");
+    await rabbitMQ.createExchange(config.RABBITMQ_EXCHANGE, "direct");
 
-    await rabbitMQ.createQueue("auth-email-queue");
-    await rabbitMQ.createQueue("order-email-queue");
+    await rabbitMQ.createQueue(AUTH_EMAIL_QUEUE);
+    await rabbitMQ.createQueue(ORDER_EMAIL_QUEUE);
 
     await rabbitMQ.bindQueue(
-      "auth-email-queue",
-      "jobber-email-notification",
-      "auth-email"
+      AUTH_EMAIL_QUEUE,
+      config.RABBITMQ_EXCHANGE,
+      AUTH_EMAIL,
     );
 
     await rabbitMQ.bindQueue(
-      "order-email-queue",
-      "order-email-notification",
-      "order-email"
+      ORDER_EMAIL_QUEUE,
+      config.RABBITMQ_EXCHANGE,
+      ORDER_EMAIL,
     );
 
     const data = {
@@ -41,7 +46,7 @@ async function startQueues() {
       html: "<h1>This is confirmation</h1>",
     };
 
-    rabbitMQ.publish("order-email-notification", "order-email", data);
+    rabbitMQ.publish(config.RABBITMQ_EXCHANGE, ORDER_EMAIL, data);
 
     consumeAuthEmailMessages();
     consumeOrderEmailMessages();
