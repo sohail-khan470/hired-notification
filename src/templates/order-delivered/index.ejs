@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Delivered</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: #ffffff;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .content {
+            padding: 40px 30px;
+            color: #374151;
+        }
+
+        .content p {
+            margin: 0 0 16px;
+            font-size: 16px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #ede9fe;
+            color: #5b21b6;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 16px 0;
+        }
+
+        .delivery-box {
+            background-color: #f5f3ff;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .delivery-box h3 {
+            margin: 0 0 12px;
+            color: #5b21b6;
+            font-size: 20px;
+        }
+
+        .delivery-box p {
+            margin: 0;
+            color: #6b7280;
+        }
+
+        .order-summary {
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        .order-summary h4 {
+            margin: 0 0 16px;
+            font-size: 16px;
+            color: #1f2937;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .summary-row .label {
+            color: #6b7280;
+        }
+
+        .summary-row .value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .action-required {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+        }
+
+        .action-required h4 {
+            margin: 0 0 8px;
+            color: #92400e;
+            font-size: 16px;
+        }
+
+        .action-required p {
+            margin: 0;
+            font-size: 14px;
+            color: #78350f;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        .review-button {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px;
+        }
+
+        .secondary-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #ffffff;
+            color: #7c3aed !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #7c3aed;
+            margin: 8px;
+        }
+
+        .rating-section {
+            text-align: center;
+            margin: 24px 0;
+            padding: 24px;
+            background-color: #faf5ff;
+            border-radius: 12px;
+        }
+
+        .rating-section h4 {
+            margin: 0 0 12px;
+            color: #5b21b6;
+        }
+
+        .stars {
+            font-size: 32px;
+            letter-spacing: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 30px;
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .footer .brand {
+            font-weight: 600;
+            color: #8b5cf6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🎉</div>
+            <h1>Your Order Has Been Delivered!</h1>
+        </div>
+        <div class="content">
+            <p class="greeting">Hi<% if (locals.buyerUsername || locals.userName) { %>
+                    <%= buyerUsername || userName %>
+                        <% } %>,</p>
+            <p>Great news! Your order has been delivered and is ready for your review.</p>
+
+            <span class="status-badge">📦 Delivered</span>
+
+            <div class="delivery-box">
+                <h3>🎊 Delivery Complete</h3>
+                <p>The seller has submitted the final deliverables for your order.</p>
+            </div>
+
+            <div class="order-summary">
+                <h4>Order Details</h4>
+                <% if (locals.orderId) { %>
+                    <div class="summary-row">
+                        <span class="label">Order ID</span>
+                        <span class="value">#<%= orderId %></span>
+                    </div>
+                    <% } %>
+                        <% if (locals.serviceName || locals.gigTitle) { %>
+                            <div class="summary-row">
+                                <span class="label">Service</span>
+                                <span class="value">
+                                    <%= serviceName || gigTitle %>
+                                </span>
+                            </div>
+                            <% } %>
+                                <% if (locals.sellerUsername) { %>
+                                    <div class="summary-row">
+                                        <span class="label">Seller</span>
+                                        <span class="value">
+                                            <%= sellerUsername %>
+                                        </span>
+                                    </div>
+                                    <% } %>
+                                        <% if (locals.deliveredAt || locals.deliveryDate) { %>
+                                            <div class="summary-row">
+                                                <span class="label">Delivered On</span>
+                                                <span class="value">
+                                                    <%= deliveredAt || deliveryDate %>
+                                                </span>
+                                            </div>
+                                            <% } %>
+            </div>
+
+            <div class="action-required">
+                <h4>⏰ Action Required</h4>
+                <p>Please review the delivered work within <strong>3 days</strong>. If you don't respond, the order will
+                    be automatically marked as complete.</p>
+            </div>
+
+            <div class="rating-section">
+                <h4>How was your experience?</h4>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p>Your feedback helps sellers improve and helps other buyers make informed decisions.</p>
+            </div>
+
+            <div class="button-container">
+                <% if (locals.orderLink) { %>
+                    <a href="<%= orderLink %>" class="review-button">Review Delivery</a>
+                    <% } %>
+                        <% if (locals.revisionLink) { %>
+                            <a href="<%= revisionLink %>" class="secondary-button">Request Revision</a>
+                            <% } %>
+            </div>
+
+            <p>Thank you for using Jobber!</p>
+            <p>Best regards,<br><strong>The Jobber Team</strong></p>
+        </div>
+        <div class="footer">
+            <p>© <%= new Date().getFullYear() %> <span class="brand">Jobber</span>. All rights reserved.</p>
+            <p>Need help? <a href="#" style="color: #8b5cf6;">Contact Support</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

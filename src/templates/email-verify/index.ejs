@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #ffffff;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .content {
+            padding: 40px 30px;
+            color: #374151;
+        }
+
+        .content p {
+            margin: 0 0 16px;
+            font-size: 16px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        .verify-button {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .verify-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        .link-fallback {
+            background-color: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 24px 0;
+            word-break: break-all;
+        }
+
+        .link-fallback p {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .link-fallback a {
+            color: #4f46e5;
+            font-size: 14px;
+        }
+
+        .warning {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 24px 0;
+        }
+
+        .warning p {
+            margin: 0;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 30px;
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .footer .brand {
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        .social-links {
+            margin-top: 16px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            color: #6b7280;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">✉️</div>
+            <h1>Verify Your Email Address</h1>
+        </div>
+        <div class="content">
+            <p class="greeting">Hi<% if (locals.userName) { %>
+                    <%= userName %>
+                        <% } %>,</p>
+            <p>Thank you for signing up with <strong>Jobber</strong>! To complete your registration and start exploring
+                our platform, please verify your email address.</p>
+
+            <div class="button-container">
+                <a href="<%= verificationLink %>" class="verify-button">Verify Email Address</a>
+            </div>
+
+            <div class="link-fallback">
+                <p>If the button doesn't work, copy and paste this link into your browser:</p>
+                <a href="<%= verificationLink %>">
+                    <%= verificationLink %>
+                </a>
+            </div>
+
+            <div class="warning">
+                <p><strong>⚠️ Important:</strong> This verification link will expire in 24 hours. If you didn't create
+                    an account with Jobber, please ignore this email.</p>
+            </div>
+
+            <p>Once verified, you'll have full access to:</p>
+            <ul>
+                <li>Browse and apply for jobs</li>
+                <li>Create and manage your profile</li>
+                <li>Connect with employers</li>
+                <li>Track your applications</li>
+            </ul>
+
+            <p>Best regards,<br><strong>The Jobber Team</strong></p>
+        </div>
+        <div class="footer">
+            <p>© <%= new Date().getFullYear() %> <span class="brand">Jobber</span>. All rights reserved.</p>
+            <p>This email was sent to <% if (locals.to) { %>
+                    <%= to %>
+                        <% } else { %>you<% } %> because you registered on our platform.</p>
+            <div class="social-links">
+                <a href="#">Twitter</a> | <a href="#">LinkedIn</a> | <a href="#">Facebook</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

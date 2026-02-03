@@ -1,0 +1,1 @@
+Your Order Has Been Delivered - Jobber<% if (locals.orderId) { %> #<%= orderId %><% } %>
