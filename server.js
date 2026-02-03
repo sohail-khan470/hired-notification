@@ -40,14 +40,6 @@ async function startQueues() {
       ORDER_EMAIL,
     );
 
-    const data = {
-      to: "sohailturk470@gmail.com",
-      subject: "This is another email",
-      html: "<h1>This is confirmation</h1>",
-    };
-
-    rabbitMQ.publish(config.RABBITMQ_EXCHANGE, ORDER_EMAIL, data);
-
     consumeAuthEmailMessages();
     consumeOrderEmailMessages();
 

@@ -2,12 +2,9 @@ const logger = require("../utils/logger");
 const rabbitMQ = require("../utils/rabbitmq");
 const transporter = require("../utils/mail-transport");
 const { renderTemplate } = require("../utils/template-renderer");
-const {
-  ORDER_EMAIL,
-  ORDER_EMAIL_QUEUE,
-  AUTH_EMAIL_QUEUE,
-} = require("../constants");
-const { RABBITMQ_EXCHANGE } = require("../utils/config");
+const { AUTH_EMAIL_QUEUE, ORDER_EMAIL_QUEUE } = require("../constants");
+const config = require("../utils/config");
+
 /**
  * Render email content based on template or raw html/subject
  */
@@ -17,6 +14,7 @@ const getEmailContent = async (messageData) => {
       messageData.template,
       messageData.data || {},
     );
+
     return {
       subject: rendered.subject,
       html: rendered.html,
@@ -30,38 +28,56 @@ const getEmailContent = async (messageData) => {
 };
 
 /**
- * Consume auth emails
+ * ============================
+ * AUTH EMAIL CONSUMER
+ * ============================
  */
 const consumeAuthEmailMessages = () => {
   rabbitMQ.consume(AUTH_EMAIL_QUEUE, async (messageData) => {
     try {
       logger.info("📧 Sending auth email:", messageData);
 
-      const content = await getEmailContent(messageData);
+      if (messageData.type !== "EMAIL_VERIFY") {
+        logger.warn("⚠️ Unknown auth email type:", messageData.type);
+        return;
+      }
+
+      const verificationLink = `${config.CLIENT_URL}/verify-email?token=${messageData.emailVerificationToken}`;
+
+      const enrichedMessage = {
+        ...messageData,
+        data: {
+          ...messageData.data,
+          verificationLink,
+        },
+      };
+
+      const content = await getEmailContent(enrichedMessage);
 
       await transporter.sendMail({
         from: process.env.SENDER_EMAIL,
-        to: messageData.to,
+        to: enrichedMessage.to,
         subject: content.subject,
         html: content.html,
       });
 
-      logger.info("✅ Auth email sent successfully");
+      logger.info("✅ Verification email sent");
     } catch (error) {
-      console.error("❌ Error sending auth email:", error);
-      logger.error("❌ Error sending auth email:", error);
-      throw error; // rabbitMQ.consume will nack automatically
+      logger.error("❌ Error sending verification email:", error);
+      throw error;
     }
   });
 };
 
 /**
- * Consume order emails
+ * ============================
+ * ORDER EMAIL CONSUMER
+ * ============================
  */
 const consumeOrderEmailMessages = () => {
   rabbitMQ.consume(ORDER_EMAIL_QUEUE, async (messageData) => {
     try {
-      logger.info("📦 Sending order email:", messageData);
+      logger.info("📦 Order email received");
 
       const content = await getEmailContent(messageData);
 
@@ -75,9 +91,12 @@ const consumeOrderEmailMessages = () => {
       logger.info("✅ Order email sent successfully");
     } catch (error) {
       logger.error("❌ Error sending order email:", error);
-      throw error; // rabbitMQ.consume will nack automatically
+      throw error;
     }
   });
 };
 
-module.exports = { consumeAuthEmailMessages, consumeOrderEmailMessages };
+module.exports = {
+  consumeAuthEmailMessages,
+  consumeOrderEmailMessages,
+};
